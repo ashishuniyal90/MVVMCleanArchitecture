@@ -1,0 +1,6 @@
+rootProject.name = "CleanArchitecture-MVVM"
+include ':app'
+include ':dataasdasd'
+include ':domainasdas'
+include ':domain'
+include ':data'
