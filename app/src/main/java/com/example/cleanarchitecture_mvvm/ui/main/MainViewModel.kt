@@ -1,20 +1,13 @@
 package com.example.cleanarchitecture_mvvm.ui.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.model.User
-import com.example.domain.model.onFailure
-import com.example.domain.model.onSuccess
 import com.example.domain.usecase.GetAllUsersAsyncUseCase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 class MainViewModel(private val usersUseCase: GetAllUsersAsyncUseCase) : ViewModel() {
 
@@ -23,24 +16,20 @@ class MainViewModel(private val usersUseCase: GetAllUsersAsyncUseCase) : ViewMod
         get() = _userList
 
     init {
-
-
-        launch {
             usersUseCase(Unit)
-                .onSuccess {
+                .catch { e ->
+                    e.printStackTrace()
+                    println(" there was a error do something")
+                }
+                .collectIn(viewModelScope) {
                     _userList.value = it
                 }
-                .onFailure {
-                    println("Inside Error =============")
-                }
+        }
+}
+
+inline fun <T> Flow<T>.collectIn(scope: CoroutineScope, crossinline action: suspend (value: T) -> Unit): Job =
+    scope.launch {
+        collect {
+            action.invoke(it)
         }
     }
-}
-
-
-inline fun ViewModel.launch(
-    coroutineContext: CoroutineContext = Dispatchers.Main,
-    crossinline block: suspend CoroutineScope.() -> Unit
-): Job {
-    return viewModelScope.launch(coroutineContext) { block() }
-}

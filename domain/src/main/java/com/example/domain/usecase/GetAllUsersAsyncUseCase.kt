@@ -5,7 +5,7 @@ import com.example.domain.repository.IUserRepository
 
 class GetAllUsersAsyncUseCase(
     private val userRepository: IUserRepository
-) : BaseAsyncUseCase<Unit, List<User>>() {
+) : FlowUseCase<Unit, List<User>>() {
+    override suspend fun run(params: Unit) = userRepository.getAllUsers()
 
-    override suspend fun createSuspend(data: Unit) = userRepository.getAllUsers()
 }

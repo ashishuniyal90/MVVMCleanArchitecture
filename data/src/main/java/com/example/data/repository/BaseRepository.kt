@@ -1,16 +1,24 @@
 package com.example.data.repository
 
-import com.example.domain.model.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 open class BaseRepository {
 
-    protected suspend fun <T : Any> execute(call: suspend () -> T) = withContext(Dispatchers.IO) {
+    protected suspend fun <T> execute(call: suspend () -> T): T = withContext(Dispatchers.IO) {
         try {
-            Resource.Success(call())
-        } catch (ex: Throwable) {
-            Resource.Error(ex)
+            call()
+        } catch (ex: Exception) {
+            throw parseException(ex)
         }
     }
 }
+
+/**
+ * parse the system exception to user familiar exception
+ * like IOException to NoNetworkException
+ */
+fun parseException(exception: Exception): Exception {
+    return exception
+}
+
