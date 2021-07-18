@@ -18,7 +18,7 @@ class MainViewModel(private val usersUseCase: GetAllUsersAsyncUseCase) : ViewMod
     init {
             usersUseCase(Unit)
                 .catch { e ->
-                    e.printStackTrace()
+                    // parse exception to ui events
                     println(" there was a error do something")
                 }
                 .collectIn(viewModelScope) {
